@@ -9,7 +9,7 @@ Build incrementally with testing at each phase. Complete each step fully before 
 
 ### Step 1.1: Initialize Project
 ```
-Create a new Next.js 14 project called "spotify-music-trends" with the following specifications:
+Create a new Next.js 14 project called "spotify-rewrapped" with the following specifications:
 - Use TypeScript
 - Use Tailwind CSS
 - Use App Router
