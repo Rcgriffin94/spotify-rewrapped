@@ -1,7 +1,25 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { signIn, useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export default function Home() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
+  // Redirect to top-songs if already authenticated
+  useEffect(() => {
+    if (session) {
+      router.push('/top-songs')
+    }
+  }, [session, router])
+
+  const handleSignIn = async () => {
+    await signIn('spotify', { callbackUrl: '/top-songs' })
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-900 via-black to-green-900 flex items-center justify-center p-8">
       <div className="max-w-4xl w-full space-y-8">
@@ -45,8 +63,14 @@ export default function Home() {
         </div>
 
         <div className="text-center">
-          <Button variant="spotify" size="lg" className="text-lg px-8 py-6">
-            Connect with Spotify
+          <Button 
+            variant="spotify" 
+            size="lg" 
+            className="text-lg px-8 py-6"
+            onClick={handleSignIn}
+            disabled={status === "loading"}
+          >
+            {status === "loading" ? "Loading..." : "Connect with Spotify"}
           </Button>
           <p className="text-gray-400 mt-4 text-sm">
             Sign in with your Spotify account to get your personalized music insights
