@@ -4,5 +4,8 @@ export * from './auth'
 // Spotify API types  
 export * from './spotify'
 
-// UI and component types
+// UI component types
 export * from './ui'
+
+// Middleware types
+export * from './middleware'
