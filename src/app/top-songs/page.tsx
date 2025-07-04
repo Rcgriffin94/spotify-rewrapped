@@ -12,14 +12,18 @@ export default function TopSongsPage() {
   const router = useRouter()
   
   // State for controls
-  const [timeRange, setTimeRange] = useState<'short_term' | 'medium_term' | 'long_term'>('medium_term')
+  const [timeRange, setTimeRange] = useState<'short_term' | 'medium_term' | 'long_term' | 'custom'>('medium_term')
   const [limit, setLimit] = useState<number>(25)
+  const [startDate, setStartDate] = useState<string>('')
+  const [endDate, setEndDate] = useState<string>('')
 
   // Use the custom hook for data fetching
   const { data: tracks, isLoading, error, refetch } = useTopTracks(
     timeRange, 
     limit, 
-    !!session // Only fetch when we have a session
+    !!session, // Only fetch when we have a session
+    startDate,
+    endDate
   )
 
   // Redirect to home if not authenticated
@@ -30,12 +34,22 @@ export default function TopSongsPage() {
     }
   }, [session, status, router])
 
-  const handleTimeRangeChange = (newTimeRange: 'short_term' | 'medium_term' | 'long_term') => {
+  const handleTimeRangeChange = (newTimeRange: 'short_term' | 'medium_term' | 'long_term' | 'custom') => {
     setTimeRange(newTimeRange)
+    // Reset dates when switching away from custom
+    if (newTimeRange !== 'custom') {
+      setStartDate('')
+      setEndDate('')
+    }
   }
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit)
+  }
+
+  const handleDateRangeChange = (newStartDate: string, newEndDate: string) => {
+    setStartDate(newStartDate)
+    setEndDate(newEndDate)
   }
 
   if (status === "loading") {
@@ -64,6 +78,9 @@ export default function TopSongsPage() {
           limit={limit}
           onTimeRangeChange={handleTimeRangeChange}
           onLimitChange={handleLimitChange}
+          onDateRangeChange={handleDateRangeChange}
+          startDate={startDate}
+          endDate={endDate}
           isLoading={isLoading}
         />
 

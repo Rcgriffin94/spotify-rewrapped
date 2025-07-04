@@ -12,9 +12,11 @@ export interface UseSpotifyDataState<T> {
 
 // Top tracks hook
 export function useTopTracks(
-  timeRange: 'short_term' | 'medium_term' | 'long_term',
+  timeRange: 'short_term' | 'medium_term' | 'long_term' | 'custom',
   limit: number,
-  enabled: boolean = true
+  enabled: boolean = true,
+  startDate?: string,
+  endDate?: string
 ): UseSpotifyDataState<FormattedTrack[]> {
   const [data, setData] = useState<FormattedTrack[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,6 +24,12 @@ export function useTopTracks(
 
   const fetchData = useCallback(async () => {
     if (!enabled) return;
+    
+    // For custom time range, validate that dates are provided
+    if (timeRange === 'custom' && (!startDate || !endDate)) {
+      setError('Start date and end date are required for custom time range');
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -31,6 +39,12 @@ export function useTopTracks(
         time_range: timeRange,
         limit: limit.toString()
       });
+
+      // Add date parameters for custom range
+      if (timeRange === 'custom' && startDate && endDate) {
+        params.append('start_date', startDate);
+        params.append('end_date', endDate);
+      }
 
       const response = await fetch(`/api/spotify/top-tracks?${params}`);
       
@@ -56,7 +70,7 @@ export function useTopTracks(
     } finally {
       setIsLoading(false);
     }
-  }, [timeRange, limit, enabled]);
+  }, [timeRange, limit, enabled, startDate, endDate]);
 
   useEffect(() => {
     fetchData();
@@ -72,9 +86,11 @@ export function useTopTracks(
 
 // Top artists hook
 export function useTopArtists(
-  timeRange: 'short_term' | 'medium_term' | 'long_term',
+  timeRange: 'short_term' | 'medium_term' | 'long_term' | 'custom',
   limit: number,
-  enabled: boolean = true
+  enabled: boolean = true,
+  startDate?: string,
+  endDate?: string
 ): UseSpotifyDataState<FormattedArtist[]> {
   const [data, setData] = useState<FormattedArtist[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -82,6 +98,12 @@ export function useTopArtists(
 
   const fetchData = useCallback(async () => {
     if (!enabled) return;
+    
+    // For custom time range, validate that dates are provided
+    if (timeRange === 'custom' && (!startDate || !endDate)) {
+      setError('Start date and end date are required for custom time range');
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -91,6 +113,12 @@ export function useTopArtists(
         time_range: timeRange,
         limit: limit.toString()
       });
+
+      // Add date parameters for custom range
+      if (timeRange === 'custom' && startDate && endDate) {
+        params.append('start_date', startDate);
+        params.append('end_date', endDate);
+      }
 
       const response = await fetch(`/api/spotify/top-artists?${params}`);
       
@@ -116,7 +144,7 @@ export function useTopArtists(
     } finally {
       setIsLoading(false);
     }
-  }, [timeRange, limit, enabled]);
+  }, [timeRange, limit, enabled, startDate, endDate]);
 
   useEffect(() => {
     fetchData();

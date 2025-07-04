@@ -20,15 +20,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const timeRange = searchParams.get('time_range') || 'medium_term';
     const limit = parseInt(searchParams.get('limit') || '25', 10);
-
-    // Validate time_range parameter
-    const validTimeRanges = ['short_term', 'medium_term', 'long_term'];
-    if (!validTimeRanges.includes(timeRange)) {
-      return NextResponse.json(
-        { error: 'Invalid time_range. Must be one of: short_term, medium_term, long_term' },
-        { status: 400 }
-      );
-    }
+    const startDate = searchParams.get('start_date');
+    const endDate = searchParams.get('end_date');
 
     // Validate limit parameter
     const validLimits = [10, 25, 50];
@@ -39,7 +32,87 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Call Spotify API using the current function signature
+    // Handle custom time range with date parameters
+    if (timeRange === 'custom') {
+      if (!startDate || !endDate) {
+        return NextResponse.json(
+          { error: 'Custom time range requires both start_date and end_date parameters in ISO format (YYYY-MM-DD)' },
+          { status: 400 }
+        );
+      }
+
+      // Validate date format (YYYY-MM-DD)
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
+        return NextResponse.json(
+          { error: 'Invalid date format. Use YYYY-MM-DD format for start_date and end_date' },
+          { status: 400 }
+        );
+      }
+
+      // Validate date range
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const now = new Date();
+
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return NextResponse.json(
+          { error: 'Invalid date values. Please check your start_date and end_date' },
+          { status: 400 }
+        );
+      }
+
+      if (start >= end) {
+        return NextResponse.json(
+          { error: 'start_date must be before end_date' },
+          { status: 400 }
+        );
+      }
+
+      if (end > now) {
+        return NextResponse.json(
+          { error: 'end_date cannot be in the future' },
+          { status: 400 }
+        );
+      }
+
+      // Check if date range is too far in the past
+      const fiftyDaysAgo = new Date();
+      fiftyDaysAgo.setDate(now.getDate() - 50);
+      
+      if (start < fiftyDaysAgo) {
+        return NextResponse.json(
+          { 
+            error: 'Custom date ranges are limited to the last 50 days due to Spotify API constraints',
+            suggestion: 'Use predefined time ranges (short_term, medium_term, long_term) for older data'
+          },
+          { status: 400 }
+        );
+      }
+
+      // For custom ranges, return not implemented for now
+      return NextResponse.json(
+        { 
+          error: 'Custom date range functionality is coming soon. Please use predefined time ranges for now.',
+          supported_time_ranges: ['short_term', 'medium_term', 'long_term']
+        },
+        { status: 501 }
+      );
+    }
+
+    // Validate standard time_range parameter
+    const validTimeRanges = ['short_term', 'medium_term', 'long_term'];
+    if (!validTimeRanges.includes(timeRange)) {
+      return NextResponse.json(
+        { 
+          error: 'Invalid time_range. Must be one of: short_term, medium_term, long_term, custom',
+          note: 'For custom time ranges, use time_range=custom with start_date and end_date parameters'
+        },
+        { status: 400 }
+      );
+    }
+
+    // Call Spotify API using the standard time ranges
     const topArtists = await getTopArtists(
       timeRange as 'short_term' | 'medium_term' | 'long_term',
       limit
@@ -53,7 +126,8 @@ export async function GET(request: NextRequest) {
         total: topArtists.length,
         limit: limit,
         offset: 0,
-        time_range: timeRange
+        time_range: timeRange,
+        ...(startDate && endDate && { start_date: startDate, end_date: endDate })
       },
       timestamp: new Date().toISOString()
     });
