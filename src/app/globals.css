@@ -64,3 +64,43 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--spotify-green);
 }
+
+/* Custom date picker styling */
+input[type="date"] {
+  color-scheme: dark;
+  position: relative;
+}
+
+/* Calendar icon styling for webkit browsers */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  color: #9ca3af; /* gray-400 */
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  background-color: rgba(29, 185, 84, 0.1); /* spotify green with opacity */
+  color: var(--spotify-green);
+  transform: scale(1.1);
+}
+
+input[type="date"]:focus::-webkit-calendar-picker-indicator {
+  color: var(--spotify-green);
+  background-color: rgba(29, 185, 84, 0.15);
+}
+
+/* Custom styling for date input when focused */
+input[type="date"]:focus {
+  outline: none;
+}
+
+/* For Firefox */
+input[type="date"]::-moz-calendar-picker {
+  background: var(--spotify-green);
+  border: none;
+  cursor: pointer;
+}
