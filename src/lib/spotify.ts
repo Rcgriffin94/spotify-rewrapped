@@ -1,4 +1,16 @@
-import { SpotifyTopItemsResponse, SpotifyTrack, SpotifyArtist, SpotifyAudioFeatures, SpotifyRecentlyPlayed, TimeRange } from '@/types/spotify'
+import { 
+  SpotifyTopTracksResponse, 
+  SpotifyTopArtistsResponse, 
+  SpotifyRecentlyPlayedResponse,
+  SpotifyAudioFeatures,
+  SpotifyTrack,
+  SpotifyArtist,
+  SpotifyUser,
+  SpotifyApiError,
+  TimeRange,
+  TopItemsParams,
+  RecentlyPlayedParams
+} from '@/types/spotify'
 
 const SPOTIFY_BASE_URL = 'https://api.spotify.com/v1'
 
@@ -18,39 +30,76 @@ export class SpotifyApi {
     })
 
     if (!response.ok) {
-      throw new Error(`Spotify API error: ${response.status} ${response.statusText}`)
+      const error: SpotifyApiError = await response.json()
+      throw new Error(`Spotify API error: ${error.error.status} ${error.error.message}`)
     }
 
     return response.json()
   }
 
-  async getCurrentUser() {
-    return this.request('/me')
+  async getCurrentUser(): Promise<SpotifyUser> {
+    return this.request<SpotifyUser>('/me')
   }
 
-  async getTopTracks(timeRange: TimeRange = 'medium_term', limit: number = 50): Promise<SpotifyTopItemsResponse<SpotifyTrack>> {
-    return this.request(`/me/top/tracks?time_range=${timeRange}&limit=${limit}`)
+  async getTopTracks(params: TopItemsParams = {}): Promise<SpotifyTopTracksResponse> {
+    const { time_range = 'medium_term', limit = 50, offset = 0 } = params
+    return this.request<SpotifyTopTracksResponse>(
+      `/me/top/tracks?time_range=${time_range}&limit=${limit}&offset=${offset}`
+    )
   }
 
-  async getTopArtists(timeRange: TimeRange = 'medium_term', limit: number = 50): Promise<SpotifyTopItemsResponse<SpotifyArtist>> {
-    return this.request(`/me/top/artists?time_range=${timeRange}&limit=${limit}`)
+  async getTopArtists(params: TopItemsParams = {}): Promise<SpotifyTopArtistsResponse> {
+    const { time_range = 'medium_term', limit = 50, offset = 0 } = params
+    return this.request<SpotifyTopArtistsResponse>(
+      `/me/top/artists?time_range=${time_range}&limit=${limit}&offset=${offset}`
+    )
   }
 
-  async getRecentlyPlayed(limit: number = 50): Promise<SpotifyRecentlyPlayed> {
-    return this.request(`/me/player/recently-played?limit=${limit}`)
+  async getRecentlyPlayed(params: RecentlyPlayedParams = {}): Promise<SpotifyRecentlyPlayedResponse> {
+    const { limit = 50, after, before } = params
+    let query = `limit=${limit}`
+    if (after) query += `&after=${after}`
+    if (before) query += `&before=${before}`
+    
+    return this.request<SpotifyRecentlyPlayedResponse>(`/me/player/recently-played?${query}`)
   }
 
-  async getAudioFeatures(trackIds: string[]): Promise<{ audio_features: SpotifyAudioFeatures[] }> {
+  async getAudioFeatures(trackIds: string[]): Promise<{ audio_features: (SpotifyAudioFeatures | null)[] }> {
     const ids = trackIds.join(',')
-    return this.request(`/audio-features?ids=${ids}`)
+    return this.request<{ audio_features: (SpotifyAudioFeatures | null)[] }>(`/audio-features?ids=${ids}`)
   }
 
   async getTrack(id: string): Promise<SpotifyTrack> {
-    return this.request(`/tracks/${id}`)
+    return this.request<SpotifyTrack>(`/tracks/${id}`)
   }
 
   async getArtist(id: string): Promise<SpotifyArtist> {
-    return this.request(`/artists/${id}`)
+    return this.request<SpotifyArtist>(`/artists/${id}`)
+  }
+
+  async getMultipleTracks(ids: string[]): Promise<{ tracks: SpotifyTrack[] }> {
+    const trackIds = ids.join(',')
+    return this.request<{ tracks: SpotifyTrack[] }>(`/tracks?ids=${trackIds}`)
+  }
+
+  async getMultipleArtists(ids: string[]): Promise<{ artists: SpotifyArtist[] }> {
+    const artistIds = ids.join(',')
+    return this.request<{ artists: SpotifyArtist[] }>(`/artists?ids=${artistIds}`)
+  }
+
+  // Helper method to get audio features for top tracks
+  async getTopTracksWithAudioFeatures(params: TopItemsParams = {}): Promise<{
+    tracks: SpotifyTopTracksResponse
+    audioFeatures: (SpotifyAudioFeatures | null)[]
+  }> {
+    const tracks = await this.getTopTracks(params)
+    const trackIds = tracks.items.map(track => track.id)
+    const audioFeaturesResponse = await this.getAudioFeatures(trackIds)
+    
+    return {
+      tracks,
+      audioFeatures: audioFeaturesResponse.audio_features
+    }
   }
 }
 
