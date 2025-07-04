@@ -1,10 +1,10 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { signIn, useSession } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import { LoginBox } from "@/components/layout/LoginBox"
+import { TrendingUp, Users, Clock, BarChart3 } from "lucide-react"
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -17,75 +17,68 @@ export default function Home() {
     }
   }, [session, router])
 
-  const handleSignIn = async () => {
-    await signIn('spotify', { callbackUrl: '/top-songs' })
-  }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 via-black to-green-900 flex items-center justify-center p-8">
-      <div className="max-w-4xl w-full space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-5xl font-bold text-white mb-4">
-            Spotify <span className="text-green-400">Rewrapped</span>
-          </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Discover your music journey with detailed insights into your listening habits, 
-            favorite artists, and musical evolution throughout the year.
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-spotify-black via-black to-spotify-black relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-20 left-20 w-72 h-72 bg-spotify-green rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-spotify-green rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-spotify-green rounded-full blur-3xl" />
+      </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <Card className="bg-black/50 border-green-800 text-white">
-            <CardHeader>
-              <CardTitle className="text-green-400">🎵 Track Analytics</CardTitle>
-              <CardDescription className="text-gray-300">
-                Deep dive into your most played songs and discover patterns in your listening habits.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
+        <div className="max-w-6xl w-full">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left side - Hero content */}
+            <div className="space-y-8 text-center lg:text-left">
+              <div className="space-y-4">
+                <h1 className="text-5xl lg:text-6xl font-bold text-white leading-tight">
+                  Your Music
+                  <br />
+                  <span className="text-spotify-green">Rewrapped</span>
+                </h1>
+                <p className="text-xl text-gray-300 max-w-lg">
+                  Dive deep into your Spotify listening habits with beautiful visualizations 
+                  and personalized insights about your musical journey.
+                </p>
+              </div>
 
-          <Card className="bg-black/50 border-green-800 text-white">
-            <CardHeader>
-              <CardTitle className="text-green-400">🎤 Artist Insights</CardTitle>
-              <CardDescription className="text-gray-300">
-                Explore your favorite artists and see how your musical taste has evolved.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+              {/* Feature highlights */}
+              <div className="grid grid-cols-2 gap-4 max-w-md mx-auto lg:mx-0">
+                <div className="flex items-center space-x-2 text-gray-300">
+                  <TrendingUp className="w-5 h-5 text-spotify-green" />
+                  <span className="text-sm">Top Tracks</span>
+                </div>
+                <div className="flex items-center space-x-2 text-gray-300">
+                  <Users className="w-5 h-5 text-spotify-green" />
+                  <span className="text-sm">Favorite Artists</span>
+                </div>
+                <div className="flex items-center space-x-2 text-gray-300">
+                  <Clock className="w-5 h-5 text-spotify-green" />
+                  <span className="text-sm">Recent Plays</span>
+                </div>
+                <div className="flex items-center space-x-2 text-gray-300">
+                  <BarChart3 className="w-5 h-5 text-spotify-green" />
+                  <span className="text-sm">Listening Stats</span>
+                </div>
+              </div>
 
-          <Card className="bg-black/50 border-green-800 text-white">
-            <CardHeader>
-              <CardTitle className="text-green-400">📊 Music DNA</CardTitle>
-              <CardDescription className="text-gray-300">
-                Analyze the audio features that define your unique musical personality.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
+              <div className="space-y-2 text-sm text-gray-400">
+                <p>🔒 Your data stays private and secure</p>
+                <p>📊 Real-time insights from your Spotify account</p>
+                <p>🎵 Discover patterns in your music taste</p>
+              </div>
+            </div>
 
-        <div className="text-center">
-          <Button 
-            variant="spotify" 
-            size="lg" 
-            className="text-lg px-8 py-6"
-            onClick={handleSignIn}
-            disabled={status === "loading"}
-          >
-            {status === "loading" ? "Loading..." : "Connect with Spotify"}
-          </Button>
-          <p className="text-gray-400 mt-4 text-sm">
-            Sign in with your Spotify account to get your personalized music insights
-          </p>
-        </div>
-
-        <div className="text-center text-gray-500 text-sm space-y-2">
-          <p>✅ Project Structure Created</p>
-          <p>✅ Environment Configuration Complete</p>
-          <p>✅ UI Components Ready</p>
-          <p>✅ Spotify Redirect URI Requirements Confirmed</p>
-          <p>✅ All Tests Passing</p>
-          <p className="text-yellow-400">⚠️ Update your Spotify app redirect URI to:</p>
-          <p className="text-green-400 font-mono">http://127.0.0.1:3000/api/auth/callback/spotify</p>
-          <p>🔄 Next: NextAuth + Spotify OAuth Integration</p>
+            {/* Right side - Login box */}
+            <div className="flex justify-center lg:justify-end">
+              <LoginBox 
+                title="Connect Your Spotify"
+                description="Sign in to unlock personalized insights about your music listening habits"
+                className="w-full max-w-md"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
