@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   keywords: ["spotify", "music", "analytics", "listening", "stats", "wrapped", "top songs", "top artists"],
   authors: [{ name: "Spotify Rewrapped" }],
   creator: "Spotify Rewrapped",
-  metadataBase: new URL("http://localhost:3001"),
+  metadataBase: new URL("http://localhost:3000"),
   openGraph: {
     type: "website",
     locale: "en_US",
