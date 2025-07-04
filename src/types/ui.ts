@@ -326,3 +326,18 @@ export interface UsePaginationReturn {
   goToFirstPage: () => void
   goToLastPage: () => void
 }
+
+// Navigation component types
+export interface NavigationItem {
+  name: string
+  href: string
+  iconComponent: any // LucideIcon component
+  description?: string
+  isActive?: boolean
+}
+
+export interface NavigationProps {
+  items?: NavigationItem[]
+  showUserInfo?: boolean
+  onLogout?: () => void
+}
