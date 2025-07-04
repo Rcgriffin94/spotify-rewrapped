@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { AppLayout } from "@/components/layout/AppLayout"
 
 export default function StatsPage() {
   const { data: session, status } = useSession()
@@ -31,21 +30,19 @@ export default function StatsPage() {
   }
 
   return (
-    <AppLayout>
-      <div className="p-8">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl font-bold text-white mb-8">Your Music Stats</h1>
-          
-          <Card className="bg-black/50 border-green-800 text-white">
-            <CardHeader>
-              <CardTitle className="text-green-400">📊 Stats & Analytics Coming Soon!</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>We'll implement detailed music statistics and analytics here.</p>
-            </CardContent>
-          </Card>
-        </div>
+    <div className="p-8">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-4xl font-bold text-white mb-8">Your Music Stats</h1>
+        
+        <Card className="bg-black/50 border-green-800 text-white">
+          <CardHeader>
+            <CardTitle className="text-green-400">📊 Stats & Analytics Coming Soon!</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>We'll implement detailed music statistics and analytics here.</p>
+          </CardContent>
+        </Card>
       </div>
-    </AppLayout>
+    </div>
   )
 }

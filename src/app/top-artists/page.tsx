@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { AppLayout } from "@/components/layout/AppLayout"
 
 export default function TopArtistsPage() {
   const { data: session, status } = useSession()
@@ -31,21 +30,19 @@ export default function TopArtistsPage() {
   }
 
   return (
-    <AppLayout>
-      <div className="p-8">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl font-bold text-white mb-8">Your Top Artists</h1>
-          
-          <Card className="bg-black/50 border-green-800 text-white">
-            <CardHeader>
-              <CardTitle className="text-green-400">🎤 Top Artists Coming Soon!</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>We'll implement the top artists API and display functionality here.</p>
-            </CardContent>
-          </Card>
-        </div>
+    <div className="p-8">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-4xl font-bold text-white mb-8">Your Top Artists</h1>
+        
+        <Card className="bg-black/50 border-green-800 text-white">
+          <CardHeader>
+            <CardTitle className="text-green-400">🎤 Top Artists Coming Soon!</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>We'll implement the top artists API and display functionality here.</p>
+          </CardContent>
+        </Card>
       </div>
-    </AppLayout>
+    </div>
   )
 }

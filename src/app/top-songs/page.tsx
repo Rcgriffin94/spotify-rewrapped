@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { AppLayout } from "@/components/layout/AppLayout"
 
 export default function TopSongsPage() {
   const { data: session, status } = useSession()
@@ -20,7 +19,7 @@ export default function TopSongsPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-900 via-black to-green-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
       </div>
     )
@@ -31,12 +30,10 @@ export default function TopSongsPage() {
   }
 
   return (
-    <AppLayout>
-      <div className="p-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-white">Your Top Songs</h1>
-          </div>
+    <div className="p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-white">Your Top Songs</h1>
         </div>
 
         <Card className="bg-black/50 border-green-800 text-white">
@@ -71,6 +68,6 @@ export default function TopSongsPage() {
           </CardContent>
         </Card>
       </div>
-    </AppLayout>
+    </div>
   )
 }
