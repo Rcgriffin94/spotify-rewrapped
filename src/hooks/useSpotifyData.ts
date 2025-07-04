@@ -25,9 +25,11 @@ export function useTopTracks(
   const fetchData = useCallback(async () => {
     if (!enabled) return;
     
-    // For custom time range, validate that dates are provided
-    if (timeRange === 'custom' && (!startDate || !endDate)) {
-      setError('Start date and end date are required for custom time range');
+    // For custom time range, validate that both dates are provided and not empty
+    if (timeRange === 'custom' && (!startDate || !endDate || startDate === '' || endDate === '')) {
+      // Don't show error, just don't fetch yet - user might still be selecting dates
+      setError(null);
+      setIsLoading(false);
       return;
     }
 
@@ -99,9 +101,11 @@ export function useTopArtists(
   const fetchData = useCallback(async () => {
     if (!enabled) return;
     
-    // For custom time range, validate that dates are provided
-    if (timeRange === 'custom' && (!startDate || !endDate)) {
-      setError('Start date and end date are required for custom time range');
+    // For custom time range, validate that both dates are provided and not empty
+    if (timeRange === 'custom' && (!startDate || !endDate || startDate === '' || endDate === '')) {
+      // Don't show error, just don't fetch yet - user might still be selecting dates
+      setError(null);
+      setIsLoading(false);
       return;
     }
 

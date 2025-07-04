@@ -86,16 +86,14 @@ export default function ListControls({
 
   const handleStartDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newStartDate = event.target.value;
-    if (newStartDate && endDate) {
-      onDateRangeChange(newStartDate, endDate);
-    }
+    // Always call the callback with the new start date, even if end date isn't set yet
+    onDateRangeChange(newStartDate, endDate || '');
   };
 
   const handleEndDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newEndDate = event.target.value;
-    if (startDate && newEndDate) {
-      onDateRangeChange(startDate, newEndDate);
-    }
+    // Always call the callback with the new end date, even if start date isn't set yet
+    onDateRangeChange(startDate || '', newEndDate);
   };
 
   return (
