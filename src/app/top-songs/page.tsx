@@ -1,10 +1,10 @@
 "use client"
 
-import { useSession, signOut } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { AppLayout } from "@/components/layout/AppLayout"
 
 export default function TopSongsPage() {
   const { data: session, status } = useSession()
@@ -31,20 +31,11 @@ export default function TopSongsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 via-black to-green-900 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-white">Your Top Songs</h1>
-          <div className="flex items-center gap-4">
-            <div className="text-white">
-              Welcome, {session.user?.name || session.user?.email}!
-            </div>
-            <Button 
-              variant="outline" 
-              onClick={() => signOut({ callbackUrl: '/' })}
-            >
-              Sign Out
-            </Button>
+    <AppLayout>
+      <div className="p-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-white">Your Top Songs</h1>
           </div>
         </div>
 
@@ -80,6 +71,6 @@ export default function TopSongsPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </AppLayout>
   )
 }
