@@ -1,5 +1,6 @@
 import { ReactNode } from "react"
 import { TimeRange, TopTrack, TopArtist, RecentlyPlayed, ListeningStats } from "./spotify"
+import { FormattedTrack } from "@/lib/spotify-api"
 
 // Base component props
 export interface BaseComponentProps {
@@ -24,35 +25,28 @@ export interface ApiState<T = any> {
 
 // List control components
 export interface ListControlsProps {
-  timeRange: TimeRange
-  limit: number
-  onTimeRangeChange: (timeRange: TimeRange) => void
-  onLimitChange: (limit: number) => void
-  disabled?: boolean
-  className?: string
+  onTimeRangeChange: (timeRange: 'short_term' | 'medium_term' | 'long_term') => void;
+  onLimitChange: (limit: number) => void;
+  timeRange: 'short_term' | 'medium_term' | 'long_term';
+  limit: number;
+  isLoading?: boolean;
 }
 
 export interface TimeRangeOption {
-  value: TimeRange
-  label: string
-  description: string
+  value: 'short_term' | 'medium_term' | 'long_term';
+  label: string;
+  description: string;
 }
 
 export interface LimitOption {
-  value: number
-  label: string
+  value: number;
+  label: string;
 }
 
 // Music item components
 export interface TrackListItemProps {
-  track: TopTrack
-  rank: number
-  showRank?: boolean
-  showPlayCount?: boolean
-  showAlbum?: boolean
-  compact?: boolean
-  className?: string
-  onClick?: (track: TopTrack) => void
+  track: FormattedTrack;
+  showRank?: boolean;
 }
 
 export interface ArtistListItemProps {
@@ -340,4 +334,22 @@ export interface NavigationProps {
   items?: NavigationItem[]
   showUserInfo?: boolean
   onLogout?: () => void
+}
+
+// API Response types
+export interface TopTracksApiResponse {
+  success: boolean;
+  data: {
+    tracks: FormattedTrack[];
+    total: number;
+    limit: number;
+    offset: number;
+    time_range: string;
+  };
+  timestamp: string;
+}
+
+export interface ApiError {
+  error: string;
+  code?: string;
 }
