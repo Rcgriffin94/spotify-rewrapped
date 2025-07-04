@@ -167,7 +167,7 @@ export default function ListControls({
           <div className="border-t border-gray-700 pt-4">
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end">
               {/* Start Date */}
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 spotify-date-picker">
                 <label htmlFor="start-date" className="block text-sm font-medium text-green-400 mb-2">
                   Start Date
                 </label>
@@ -190,7 +190,7 @@ export default function ListControls({
               </div>
 
               {/* End Date */}
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 spotify-date-picker">
                 <label htmlFor="end-date" className="block text-sm font-medium text-green-400 mb-2">
                   End Date
                 </label>
