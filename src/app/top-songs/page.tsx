@@ -16,9 +16,10 @@ export default function TopSongsPage() {
   const [limit, setLimit] = useState<number>(25)
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
+  const [hasUserInteracted, setHasUserInteracted] = useState(false)
 
   // Use the custom hook for data fetching
-  const { data: tracks, isLoading, error, refetch } = useTopTracks(
+  const { data: tracks, isLoading, error, refetch, retryCount } = useTopTracks(
     timeRange, 
     limit, 
     !!session, // Only fetch when we have a session
@@ -36,6 +37,7 @@ export default function TopSongsPage() {
 
   const handleTimeRangeChange = (newTimeRange: 'short_term' | 'medium_term' | 'long_term' | 'custom') => {
     setTimeRange(newTimeRange)
+    setHasUserInteracted(true)
     // Reset dates when switching away from custom
     if (newTimeRange !== 'custom') {
       setStartDate('')
@@ -45,11 +47,13 @@ export default function TopSongsPage() {
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit)
+    setHasUserInteracted(true)
   }
 
   const handleDateRangeChange = (newStartDate: string, newEndDate: string) => {
     setStartDate(newStartDate)
     setEndDate(newEndDate)
+    setHasUserInteracted(true)
   }
 
   if (status === "loading") {
@@ -84,18 +88,39 @@ export default function TopSongsPage() {
           isLoading={isLoading}
         />
 
+        {/* Custom date range helper */}
+        {timeRange === 'custom' && (!startDate || !endDate) && hasUserInteracted && (
+          <div className="mb-6 p-4 bg-amber-900/50 border border-amber-700 rounded-lg">
+            <div className="flex items-center gap-2 text-amber-400">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <span className="font-medium">Custom Date Range Required</span>
+            </div>
+            <p className="text-amber-200 mt-2">
+              Please select both start and end dates to see your top songs for a custom time period.
+            </p>
+          </div>
+        )}
+
         {/* Error Display */}
         {error && (
           <ErrorDisplay 
             error={error} 
             onRetry={refetch}
+            retryCount={retryCount}
+            isRetrying={isLoading}
             className="mb-6"
           />
         )}
 
         {/* Loading State */}
         {isLoading && (
-          <LoadingState message="Loading your top songs..." />
+          <LoadingState 
+            message="Loading your top songs..." 
+            showProgress={true}
+            retryCount={retryCount}
+          />
         )}
 
         {/* Tracks List */}
@@ -112,15 +137,32 @@ export default function TopSongsPage() {
         )}
 
         {/* Empty State */}
-        {!isLoading && !error && tracks && tracks.length === 0 && (
+        {!isLoading && !error && tracks && tracks.length === 0 && hasUserInteracted && (
           <Card className="bg-black/50 border-gray-800 text-white">
             <CardContent className="py-12 text-center">
-              <div className="text-gray-400 text-lg">
-                No tracks found for the selected time period.
+              <div className="flex flex-col items-center gap-4">
+                <svg className="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                </svg>
+                <div>
+                  <div className="text-gray-400 text-lg font-medium mb-2">
+                    No tracks found for the selected time period
+                  </div>
+                  <p className="text-gray-500">
+                    Try selecting a different time range or make sure you have been listening to music on Spotify.
+                  </p>
+                </div>
+                <button 
+                  onClick={() => {
+                    setTimeRange('medium_term')
+                    setStartDate('')
+                    setEndDate('')
+                  }}
+                  className="mt-4 px-4 py-2 bg-spotify-green hover:bg-green-500 text-black font-medium rounded-md transition-colors"
+                >
+                  View Last 6 Months
+                </button>
               </div>
-              <p className="text-gray-500 mt-2">
-                Try selecting a different time range or make sure you have been listening to music on Spotify.
-              </p>
             </CardContent>
           </Card>
         )}

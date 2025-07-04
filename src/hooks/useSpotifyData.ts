@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { FormattedTrack, FormattedArtist } from '@/lib/spotify-api';
 import type { TopTracksApiResponse, ApiError } from '@/types/ui';
 
@@ -8,7 +8,18 @@ export interface UseSpotifyDataState<T> {
   isLoading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
+  retryCount: number;
 }
+
+// Retry configuration
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  retryDelay: 1000, // 1 second
+  backoffMultiplier: 2
+};
+
+// Helper function for retry delay
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Top tracks hook
 export function useTopTracks(
@@ -21,8 +32,10 @@ export function useTopTracks(
   const [data, setData] = useState<FormattedTrack[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (retryAttempt: number = 0) => {
     if (!enabled) return;
     
     // For custom time range, validate that both dates are provided and not empty
@@ -30,11 +43,21 @@ export function useTopTracks(
       // Don't show error, just don't fetch yet - user might still be selecting dates
       setError(null);
       setIsLoading(false);
+      setRetryCount(0);
       return;
     }
 
+    // Cancel any ongoing requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    // Create new abort controller
+    abortControllerRef.current = new AbortController();
+
     setIsLoading(true);
     setError(null);
+    setRetryCount(retryAttempt);
 
     try {
       const params = new URLSearchParams({
@@ -48,7 +71,9 @@ export function useTopTracks(
         params.append('end_date', endDate);
       }
 
-      const response = await fetch(`/api/spotify/top-tracks?${params}`);
+      const response = await fetch(`/api/spotify/top-tracks?${params}`, {
+        signal: abortControllerRef.current.signal
+      });
       
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}`;
@@ -64,8 +89,31 @@ export function useTopTracks(
 
       const responseData: TopTracksApiResponse = await response.json();
       setData(responseData.data.tracks);
+      setError(null);
+      setRetryCount(0);
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        // Request was cancelled, don't update state
+        return;
+      }
+
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch tracks';
+      
+      // Retry logic for non-client errors
+      if (retryAttempt < RETRY_CONFIG.maxRetries && 
+          err instanceof Error && 
+          !errorMessage.includes('401') && // Don't retry auth errors
+          !errorMessage.includes('403')) {  // Don't retry forbidden errors
+        
+        const delayMs = RETRY_CONFIG.retryDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, retryAttempt);
+        await delay(delayMs);
+        
+        // Check if component is still mounted before retrying
+        if (abortControllerRef.current && !abortControllerRef.current.signal.aborted) {
+          return fetchData(retryAttempt + 1);
+        }
+      }
+
       setError(errorMessage);
       console.error('Error fetching top tracks:', err);
       setData([]);
@@ -74,15 +122,27 @@ export function useTopTracks(
     }
   }, [timeRange, limit, enabled, startDate, endDate]);
 
+  const refetch = useCallback(async () => {
+    await fetchData(0);
+  }, [fetchData]);
+
   useEffect(() => {
     fetchData();
+    
+    // Cleanup function
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [fetchData]);
 
   return {
     data,
     isLoading,
     error,
-    refetch: fetchData
+    refetch,
+    retryCount
   };
 }
 
@@ -97,8 +157,10 @@ export function useTopArtists(
   const [data, setData] = useState<FormattedArtist[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (retryAttempt: number = 0) => {
     if (!enabled) return;
     
     // For custom time range, validate that both dates are provided and not empty
@@ -106,11 +168,21 @@ export function useTopArtists(
       // Don't show error, just don't fetch yet - user might still be selecting dates
       setError(null);
       setIsLoading(false);
+      setRetryCount(0);
       return;
     }
 
+    // Cancel any ongoing requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    // Create new abort controller
+    abortControllerRef.current = new AbortController();
+
     setIsLoading(true);
     setError(null);
+    setRetryCount(retryAttempt);
 
     try {
       const params = new URLSearchParams({
@@ -124,7 +196,9 @@ export function useTopArtists(
         params.append('end_date', endDate);
       }
 
-      const response = await fetch(`/api/spotify/top-artists?${params}`);
+      const response = await fetch(`/api/spotify/top-artists?${params}`, {
+        signal: abortControllerRef.current.signal
+      });
       
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}`;
@@ -140,8 +214,31 @@ export function useTopArtists(
 
       const responseData = await response.json();
       setData(responseData.data.artists);
+      setError(null);
+      setRetryCount(0);
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        // Request was cancelled, don't update state
+        return;
+      }
+
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch artists';
+      
+      // Retry logic for non-client errors
+      if (retryAttempt < RETRY_CONFIG.maxRetries && 
+          err instanceof Error && 
+          !errorMessage.includes('401') && // Don't retry auth errors
+          !errorMessage.includes('403')) {  // Don't retry forbidden errors
+        
+        const delayMs = RETRY_CONFIG.retryDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, retryAttempt);
+        await delay(delayMs);
+        
+        // Check if component is still mounted before retrying
+        if (abortControllerRef.current && !abortControllerRef.current.signal.aborted) {
+          return fetchData(retryAttempt + 1);
+        }
+      }
+
       setError(errorMessage);
       console.error('Error fetching top artists:', err);
       setData([]);
@@ -150,15 +247,27 @@ export function useTopArtists(
     }
   }, [timeRange, limit, enabled, startDate, endDate]);
 
+  const refetch = useCallback(async () => {
+    await fetchData(0);
+  }, [fetchData]);
+
   useEffect(() => {
     fetchData();
+    
+    // Cleanup function
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [fetchData]);
 
   return {
     data,
     isLoading,
     error,
-    refetch: fetchData
+    refetch,
+    retryCount
   };
 }
 
@@ -171,12 +280,23 @@ export function useSpotifyData<T>(
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (retryAttempt: number = 0) => {
     if (!enabled) return;
+
+    // Cancel any ongoing requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    // Create new abort controller
+    abortControllerRef.current = new AbortController();
 
     setIsLoading(true);
     setError(null);
+    setRetryCount(retryAttempt);
 
     try {
       const searchParams = new URLSearchParams();
@@ -185,7 +305,9 @@ export function useSpotifyData<T>(
       });
 
       const url = `${endpoint}?${searchParams}`;
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        signal: abortControllerRef.current.signal
+      });
       
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}`;
@@ -201,8 +323,31 @@ export function useSpotifyData<T>(
 
       const responseData = await response.json();
       setData(responseData.data || responseData);
+      setError(null);
+      setRetryCount(0);
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        // Request was cancelled, don't update state
+        return;
+      }
+
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch data';
+      
+      // Retry logic for non-client errors
+      if (retryAttempt < RETRY_CONFIG.maxRetries && 
+          err instanceof Error && 
+          !errorMessage.includes('401') && // Don't retry auth errors
+          !errorMessage.includes('403')) {  // Don't retry forbidden errors
+        
+        const delayMs = RETRY_CONFIG.retryDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, retryAttempt);
+        await delay(delayMs);
+        
+        // Check if component is still mounted before retrying
+        if (abortControllerRef.current && !abortControllerRef.current.signal.aborted) {
+          return fetchData(retryAttempt + 1);
+        }
+      }
+
       setError(errorMessage);
       console.error(`Error fetching data from ${endpoint}:`, err);
       setData(null);
@@ -211,14 +356,26 @@ export function useSpotifyData<T>(
     }
   }, [endpoint, params, enabled]);
 
+  const refetch = useCallback(async () => {
+    await fetchData(0);
+  }, [fetchData]);
+
   useEffect(() => {
     fetchData();
+    
+    // Cleanup function
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [fetchData]);
 
   return {
     data,
     isLoading,
     error,
-    refetch: fetchData
+    refetch,
+    retryCount
   };
 }

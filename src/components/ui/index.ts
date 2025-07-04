@@ -3,3 +3,4 @@ export { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 export { default as Spinner } from './spinner'
 export { default as ErrorDisplay } from './error-display'
 export { default as LoadingState } from './loading-state'
+export { default as Toast, ToastProvider, useToast } from './toast'
