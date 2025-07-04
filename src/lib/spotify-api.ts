@@ -128,7 +128,7 @@ function validateTimeRange(timeRange: string): 'short_term' | 'medium_term' | 'l
 
 // Helper function to validate limit
 function validateLimit(limit: number): number {
-  const validLimits = [10, 25, 50, 100]
+  const validLimits = [10, 25, 50]
   if (!validLimits.includes(limit)) {
     throw new Error(`Invalid limit: ${limit}. Must be one of: ${validLimits.join(', ')}`)
   }

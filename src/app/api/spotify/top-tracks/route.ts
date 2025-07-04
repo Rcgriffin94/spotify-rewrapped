@@ -31,10 +31,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Validate limit parameter
-    const validLimits = [10, 25, 50, 100];
+    const validLimits = [10, 25, 50];
     if (!validLimits.includes(limit)) {
       return NextResponse.json(
-        { error: 'Invalid limit. Must be one of: 10, 25, 50, 100' },
+        { error: 'Invalid limit. Must be one of: 10, 25, 50' },
         { status: 400 }
       );
     }

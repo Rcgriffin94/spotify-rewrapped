@@ -41,8 +41,7 @@ const timeRangeOptions: TimeRangeOption[] = [
 const limitOptions: LimitOption[] = [
   { value: 10, label: '10 songs' },
   { value: 25, label: '25 songs' },
-  { value: 50, label: '50 songs' },
-  { value: 100, label: '100 songs' }
+  { value: 50, label: '50 songs' }
 ];
 
 export default function ListControls({

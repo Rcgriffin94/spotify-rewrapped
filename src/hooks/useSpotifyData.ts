@@ -35,8 +35,15 @@ export function useTopTracks(
       const response = await fetch(`/api/spotify/top-tracks?${params}`);
       
       if (!response.ok) {
-        const errorData: ApiError = await response.json();
-        throw new Error(errorData.error || `HTTP ${response.status}`);
+        let errorMessage = `HTTP ${response.status}`;
+        try {
+          const errorData: ApiError = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // If response is not JSON, use the status text or default message
+          errorMessage = response.statusText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
       const responseData: TopTracksApiResponse = await response.json();
@@ -88,8 +95,15 @@ export function useTopArtists(
       const response = await fetch(`/api/spotify/top-artists?${params}`);
       
       if (!response.ok) {
-        const errorData: ApiError = await response.json();
-        throw new Error(errorData.error || `HTTP ${response.status}`);
+        let errorMessage = `HTTP ${response.status}`;
+        try {
+          const errorData: ApiError = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // If response is not JSON, use the status text or default message
+          errorMessage = response.statusText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
       const responseData = await response.json();
@@ -142,8 +156,15 @@ export function useSpotifyData<T>(
       const response = await fetch(url);
       
       if (!response.ok) {
-        const errorData: ApiError = await response.json();
-        throw new Error(errorData.error || `HTTP ${response.status}`);
+        let errorMessage = `HTTP ${response.status}`;
+        try {
+          const errorData: ApiError = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // If response is not JSON, use the status text or default message
+          errorMessage = response.statusText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
       const responseData = await response.json();
