@@ -35,17 +35,21 @@ export const ListeningActivityChart: React.FC<ListeningActivityChartProps> = ({
       {/* Hourly Distribution */}
       <div className="mb-8">
         <h4 className="text-md font-medium text-gray-300 mb-3">By Hour of Day</h4>
-        <div className="flex items-end space-x-1 h-24">
+        <div className="flex items-end space-x-1 h-24 bg-gray-700/20 rounded">
           {hourlyData.map((item) => {
             const height = maxHourlyCount > 0 ? (item.count / maxHourlyCount) * 100 : 0;
+            const minHeight = item.count > 0 ? Math.max(height, 5) : height; // Minimum 5% for visible bars
             return (
               <div
                 key={item.hour}
                 className="flex-1 flex flex-col items-center group"
               >
                 <div
-                  className="w-full bg-spotify-green rounded-t transition-all duration-300 hover:bg-spotify-green/80"
-                  style={{ height: `${height}%` }}
+                  className="w-full rounded-t transition-all duration-300"
+                  style={{ 
+                    height: `${minHeight}%`,
+                    backgroundColor: '#1db954' // Spotify green direct color
+                  }}
                   title={`${item.hour}:00 - ${item.count} plays`}
                 />
                 <span className="text-xs text-gray-500 mt-1">
@@ -75,8 +79,11 @@ export const ListeningActivityChart: React.FC<ListeningActivityChartProps> = ({
                 </span>
                 <div className="flex-1 bg-gray-700 rounded-full h-3">
                   <div
-                    className="bg-spotify-green h-3 rounded-full transition-all duration-300"
-                    style={{ width: `${width}%` }}
+                    className="h-3 rounded-full transition-all duration-300"
+                    style={{ 
+                      width: `${width}%`,
+                      backgroundColor: '#1db954' // Spotify green direct color
+                    }}
                     title={`${item.count} plays`}
                   />
                 </div>
