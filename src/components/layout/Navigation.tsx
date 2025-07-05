@@ -28,7 +28,7 @@ const navigationItems = [
   },
   {
     name: "Listening Stats",
-    href: "/stats",
+    href: "/listening-stats",
     icon: BarChart3,
     description: "Detailed analytics"
   }

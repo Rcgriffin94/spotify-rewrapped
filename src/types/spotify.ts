@@ -300,6 +300,41 @@ export interface ListeningStats {
   }
 }
 
+// Additional Listening Statistics Types for Dashboard
+export interface DashboardStats {
+  totalTopTracks: number
+  totalTopArtists: number
+  totalRecentTracks: number
+  followerCount: number
+  userCountry: string
+  topGenres: {
+    genre: string
+    count: number
+    percentage: number
+  }[]
+  averageTrackPopularity: number
+  averageArtistPopularity: number
+  monthlyTopTrack: SpotifyTrack | null
+  allTimeTopTrack: SpotifyTrack | null
+  monthlyTopArtist: SpotifyArtist | null
+  allTimeTopArtist: SpotifyArtist | null
+  listeningActivity: ListeningActivity
+  uniqueArtistsLastMonth: number
+  uniqueArtistsAllTime: number
+  audioFeatures: AudioFeaturesStats
+}
+
+export interface ListeningActivity {
+  hourlyDistribution: Record<string, number>
+  dayOfWeekDistribution: Record<string, number>
+}
+
+export interface AudioFeaturesStats {
+  danceable: number
+  energetic: number
+  valence: number
+}
+
 // API request parameters
 export interface TopItemsParams {
   time_range?: TimeRange
