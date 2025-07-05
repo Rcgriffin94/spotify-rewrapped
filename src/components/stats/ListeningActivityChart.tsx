@@ -49,61 +49,86 @@ export const ListeningActivityChart: React.FC<ListeningActivityChartProps> = ({
       {/* Hourly Distribution */}
       <div className="mb-8">
         <h4 className="text-md font-medium text-gray-300 mb-3">By Hour of Day</h4>
-        <div className="flex items-end space-x-1 h-24 bg-gray-700/20 rounded">
-          {hourlyData.map((item) => {
+        <div className="relative h-32 bg-gray-700/20 rounded p-2 flex items-end justify-between">
+          {hourlyData.map((item, index) => {
             const height = maxHourlyCount > 0 ? (item.count / maxHourlyCount) * 100 : 0;
-            const minHeight = item.count > 0 ? Math.max(height, 5) : height; // Minimum 5% for visible bars
+            const barHeight = item.count > 0 ? Math.max(height, 5) : 0;
+            
             return (
               <div
                 key={item.hour}
-                className="flex-1 flex flex-col items-center group"
+                className="relative flex flex-col items-center justify-end group"
+                style={{ 
+                  width: 'calc(100% / 24)',
+                  height: '100%',
+                  minWidth: '8px'
+                }}
               >
-                <div
-                  className="w-full rounded-t transition-all duration-300"
-                  style={{ 
-                    height: `${minHeight}%`,
-                    backgroundColor: '#1db954' // Spotify green direct color
-                  }}
-                  title={`${item.hour}:00 - ${item.count} plays`}
-                />
-                <span className="text-xs text-gray-500 mt-1">
-                  {parseInt(item.hour) % 6 === 0 ? item.hour : ''}
-                </span>
+                {/* Bar */}
+                {item.count > 0 && (
+                  <div
+                    className="w-4/5 rounded-t transition-all duration-300 hover:opacity-80 hover:scale-105"
+                    style={{ 
+                      height: `${barHeight}%`,
+                      backgroundColor: '#1db954',
+                      minHeight: '4px'
+                    }}
+                    title={`${item.hour}:00 - ${item.count} plays`}
+                  />
+                )}
+                
+                {/* Show count on hover or for significant bars */}
+                {item.count > 0 && (
+                  <span className="text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity absolute -top-6 bg-gray-900 px-1 rounded">
+                    {item.count}
+                  </span>
+                )}
               </div>
             );
           })}
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
+        
+        {/* Time labels */}
+        <div className="flex justify-between text-xs text-gray-500 mt-4 px-2">
           <span>00:00</span>
+          <span>06:00</span>
           <span>12:00</span>
+          <span>18:00</span>
           <span>23:00</span>
         </div>
       </div>
 
       {/* Daily Distribution */}
       <div>
-        <h4 className="text-md font-medium text-gray-300 mb-3">By Day of Week</h4>
-        <div className="space-y-2">
+        <h4 className="text-md font-medium text-gray-300 mb-4">By Day of Week</h4>
+        <div className="space-y-3">
           {dailyData.map((item) => {
             const width = maxDailyCount > 0 ? (item.count / maxDailyCount) * 100 : 0;
             return (
               <div key={item.day} className="flex items-center space-x-3">
-                <span className="text-sm font-medium text-gray-400 w-8">
+                <span className="text-sm font-medium text-gray-400 w-10 text-right">
                   {item.day}
                 </span>
-                <div className="flex-1 bg-gray-700 rounded-full h-3">
+                <div className="flex-1 bg-gray-700 rounded-full h-4 relative group">
                   <div
-                    className="h-3 rounded-full transition-all duration-300"
+                    className="h-4 rounded-full transition-all duration-300 group-hover:opacity-80"
                     style={{ 
-                      width: `${width}%`,
-                      backgroundColor: '#1db954' // Spotify green direct color
+                      width: `${Math.max(width, item.count > 0 ? 8 : 0)}%`,
+                      backgroundColor: '#1db954'
                     }}
                     title={`${item.count} plays`}
                   />
+                  {/* Show count inside bar if there's space, otherwise outside */}
+                  {item.count > 0 && (
+                    <span className={`absolute text-xs font-medium transition-opacity ${
+                      width > 15 
+                        ? 'text-black left-2 top-1/2 -translate-y-1/2' 
+                        : 'text-gray-300 -right-8 top-1/2 -translate-y-1/2'
+                    }`}>
+                      {item.count}
+                    </span>
+                  )}
                 </div>
-                <span className="text-xs text-gray-500 w-8 text-right">
-                  {item.count}
-                </span>
               </div>
             );
           })}
