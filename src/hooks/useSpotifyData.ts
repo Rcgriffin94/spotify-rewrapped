@@ -15,11 +15,33 @@ export interface UseSpotifyDataState<T> {
 const RETRY_CONFIG = {
   maxRetries: 3,
   retryDelay: 1000, // 1 second
-  backoffMultiplier: 2
+  backoffMultiplier: 2,
+  retryableErrors: ['NETWORK_ERROR', 'SERVER_ERROR', 'TIMEOUT', 'RATE_LIMITED']
 };
 
-// Helper function for retry delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+// Helper function for retry delay with exponential backoff
+const delay = (ms: number, attempt: number) => {
+  const backoffMs = ms * Math.pow(RETRY_CONFIG.backoffMultiplier, attempt);
+  const maxDelay = 10000; // 10 seconds max
+  return new Promise(resolve => setTimeout(resolve, Math.min(backoffMs, maxDelay)));
+};
+
+// Helper function to determine if error is retryable
+const isRetryableError = (error: unknown): boolean => {
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    return (
+      message.includes('network') ||
+      message.includes('timeout') ||
+      message.includes('500') ||
+      message.includes('502') ||
+      message.includes('503') ||
+      message.includes('504') ||
+      message.includes('rate limit')
+    );
+  }
+  return false;
+};
 
 // Top tracks hook
 export function useTopTracks(
@@ -106,7 +128,7 @@ export function useTopTracks(
           !errorMessage.includes('403')) {  // Don't retry forbidden errors
         
         const delayMs = RETRY_CONFIG.retryDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, retryAttempt);
-        await delay(delayMs);
+        await delay(delayMs, retryAttempt);
         
         // Check if component is still mounted before retrying
         if (abortControllerRef.current && !abortControllerRef.current.signal.aborted) {
@@ -231,7 +253,7 @@ export function useTopArtists(
           !errorMessage.includes('403')) {  // Don't retry forbidden errors
         
         const delayMs = RETRY_CONFIG.retryDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, retryAttempt);
-        await delay(delayMs);
+        await delay(delayMs, retryAttempt);
         
         // Check if component is still mounted before retrying
         if (abortControllerRef.current && !abortControllerRef.current.signal.aborted) {
@@ -340,7 +362,7 @@ export function useSpotifyData<T>(
           !errorMessage.includes('403')) {  // Don't retry forbidden errors
         
         const delayMs = RETRY_CONFIG.retryDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, retryAttempt);
-        await delay(delayMs);
+        await delay(delayMs, retryAttempt);
         
         // Check if component is still mounted before retrying
         if (abortControllerRef.current && !abortControllerRef.current.signal.aborted) {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { Providers } from "@/components/providers/Providers";
 import { ClientLayout } from "@/components/layout/ClientLayout";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import "./globals.css";
 
 const inter = Inter({
@@ -58,11 +59,13 @@ export default function RootLayout({
         <meta name="theme-color" content="#1DB954" />
       </head>
       <body className="antialiased bg-gradient-to-br from-green-900 via-black to-green-900 text-white font-sans">
-        <Providers>
-          <ClientLayout>
-            {children}
-          </ClientLayout>
-        </Providers>
+        <ErrorBoundary>
+          <Providers>
+            <ClientLayout>
+              {children}
+            </ClientLayout>
+          </Providers>
+        </ErrorBoundary>
       </body>
     </html>
   );

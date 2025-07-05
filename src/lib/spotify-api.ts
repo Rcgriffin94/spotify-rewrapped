@@ -15,6 +15,8 @@ const SPOTIFY_API_BASE_URL = 'https://api.spotify.com/v1'
 
 // Rate limiting configuration
 const RATE_LIMIT_DELAY = 100 // ms between requests
+const MAX_RETRIES = 3
+const RETRY_DELAY = 1000 // ms
 let lastRequestTime = 0
 
 // Rate limiting helper
@@ -25,6 +27,11 @@ const withRateLimit = async () => {
     await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_DELAY - timeSinceLastRequest))
   }
   lastRequestTime = Date.now()
+}
+
+// Exponential backoff helper
+const exponentialBackoff = (attempt: number): number => {
+  return Math.min(RETRY_DELAY * Math.pow(2, attempt), 10000) // Max 10 seconds
 }
 
 // Error classes for better error handling
@@ -57,11 +64,12 @@ export async function getUserAccessToken(): Promise<string> {
   return session.accessToken
 }
 
-// Generic API request function with error handling
+// Generic API request function with retry logic and enhanced error handling
 async function spotifyRequest<T>(
   endpoint: string,
   accessToken: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  retryCount: number = 0
 ): Promise<T> {
   await withRateLimit()
   
@@ -87,10 +95,25 @@ async function spotifyRequest<T>(
         case 403:
           throw new SpotifyAPIError('Insufficient permissions or forbidden', response.status)
         case 429:
-          const retryAfter = response.headers.get('Retry-After') || '1'
-          throw new SpotifyAPIError(`Rate limited. Retry after ${retryAfter} seconds`, response.status)
+          const retryAfter = parseInt(response.headers.get('Retry-After') || '1')
+          if (retryCount < MAX_RETRIES) {
+            await new Promise(resolve => setTimeout(resolve, retryAfter * 1000))
+            return spotifyRequest<T>(endpoint, accessToken, options, retryCount + 1)
+          }
+          throw new SpotifyAPIError(`Rate limited. Max retries exceeded`, response.status)
         case 404:
           throw new SpotifyAPIError('Resource not found', response.status)
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          // Retry server errors with exponential backoff
+          if (retryCount < MAX_RETRIES) {
+            const delay = exponentialBackoff(retryCount)
+            await new Promise(resolve => setTimeout(resolve, delay))
+            return spotifyRequest<T>(endpoint, accessToken, options, retryCount + 1)
+          }
+          throw new SpotifyAPIError(`Server error (${response.status}). Max retries exceeded`, response.status)
         case 500:
         case 502:
         case 503:
