@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react"
 import { Navigation } from "@/components/layout/Navigation"
+import { ProductionMonitoring } from "@/components/ProductionMonitoring"
 import { Toaster } from "react-hot-toast"
 import { ReactNode } from "react"
 
@@ -17,6 +18,7 @@ export function ClientLayout({ children }: ClientLayoutProps) {
 
   return (
     <>
+      <ProductionMonitoring />
       {isAuthenticated && <Navigation />}
       <main className={isAuthenticated ? "" : "min-h-screen"}>
         {children}

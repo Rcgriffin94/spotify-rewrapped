@@ -4,8 +4,11 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Card, CardContent, ErrorDisplay, LoadingState } from "@/components/ui"
+import { EmptyState } from "@/components/ui/empty-state"
+import { APIErrorBoundary } from "@/components/ErrorBoundary"
 import { RecentlyPlayedItem } from "@/components/music"
 import { FormattedRecentlyPlayed } from "@/lib/spotify-api"
+import { announceToScreenReader } from "@/lib/accessibility"
 
 export default function RecentlyPlayedPage() {
   const { data: session, status } = useSession()
