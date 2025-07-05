@@ -99,7 +99,7 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError 
 export const APIErrorBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <ErrorBoundary
-      fallback={({ error, resetError }) => (
+      fallback={({ resetError }) => (
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 text-center">
           <div className="text-red-500 mb-3">
             <svg className="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">

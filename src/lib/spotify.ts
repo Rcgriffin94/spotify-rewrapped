@@ -7,7 +7,6 @@ import {
   SpotifyArtist,
   SpotifyUser,
   SpotifyApiError,
-  TimeRange,
   TopItemsParams,
   RecentlyPlayedParams
 } from '@/types/spotify'

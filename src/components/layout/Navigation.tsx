@@ -52,12 +52,12 @@ export function Navigation() {
   }
 
   // Handle keyboard navigation
-  const handleKeyDown = (event: React.KeyboardEvent, href: string) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      router.push(href)
-    }
-  }
+  // const handleKeyDown = (event: React.KeyboardEvent, href: string) => {
+  //   if (event.key === 'Enter' || event.key === ' ') {
+  //     event.preventDefault()
+  //     router.push(href)
+  //   }
+  // }
 
   // Handle navigation with router
   const handleNavigation = (href: string) => {

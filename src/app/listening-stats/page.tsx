@@ -14,7 +14,7 @@ import LoadingState from '@/components/ui/loading-state';
 import ErrorDisplay from '@/components/ui/error-display';
 
 export default function ListeningStatsPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const { stats, loading, error, refetch } = useListeningStats();
 
   // Redirect if not authenticated
@@ -47,7 +47,7 @@ export default function ListeningStatsPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">No Statistics Available</h1>
           <p className="text-gray-400 mb-6">
-            We couldn't load your listening statistics. This might be because you don't have enough listening history.
+            We couldn&apos;t load your listening statistics. This might be because you don&apos;t have enough listening history.
           </p>
           <button
             onClick={refetch}

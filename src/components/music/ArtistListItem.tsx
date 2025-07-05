@@ -70,7 +70,7 @@ export default function ArtistListItem({ artist, showRank = true }: ArtistListIt
                 {artist.name}
               </h3>
               <div className="flex flex-wrap gap-1 mt-1">
-                {artist.genres.slice(0, 3).map((genre, index) => (
+                {artist.genres.slice(0, 3).map((genre) => (
                   <span
                     key={genre}
                     className="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded-full"

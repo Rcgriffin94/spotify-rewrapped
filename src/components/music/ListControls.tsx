@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 // Type definitions for the component
 export interface ListControlsProps {

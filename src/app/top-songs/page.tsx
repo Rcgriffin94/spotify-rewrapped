@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Card, CardContent, ErrorDisplay, LoadingState } from "@/components/ui"
+import { ErrorDisplay, LoadingState } from "@/components/ui"
 import { EmptyState } from "@/components/ui/empty-state"
 import { APIErrorBoundary } from "@/components/ErrorBoundary"
 import { ListControls, TrackListItem } from "@/components/music"

@@ -1,5 +1,5 @@
-import { Session, DefaultSession } from "next-auth"
-import { JWT, DefaultJWT } from "next-auth/jwt"
+import { DefaultSession } from "next-auth"
+import { DefaultJWT } from "next-auth/jwt"
 
 // Basic user authentication types
 export interface AuthUser {

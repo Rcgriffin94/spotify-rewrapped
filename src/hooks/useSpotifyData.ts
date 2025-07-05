@@ -27,21 +27,21 @@ const delay = (ms: number, attempt: number) => {
 };
 
 // Helper function to determine if error is retryable
-const isRetryableError = (error: unknown): boolean => {
-  if (error instanceof Error) {
-    const message = error.message.toLowerCase();
-    return (
-      message.includes('network') ||
-      message.includes('timeout') ||
-      message.includes('500') ||
-      message.includes('502') ||
-      message.includes('503') ||
-      message.includes('504') ||
-      message.includes('rate limit')
-    );
-  }
-  return false;
-};
+// const isRetryableError = (error: unknown): boolean => {
+//   if (error instanceof Error) {
+//     const message = error.message.toLowerCase();
+//     return (
+//       message.includes('network') ||
+//       message.includes('timeout') ||
+//       message.includes('500') ||
+//       message.includes('502') ||
+//       message.includes('503') ||
+//       message.includes('504') ||
+//       message.includes('rate limit')
+//     );
+//   }
+//   return false;
+// };
 
 // Top tracks hook
 export function useTopTracks(

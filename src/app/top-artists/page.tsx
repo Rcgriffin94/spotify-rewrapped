@@ -4,11 +4,8 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Card, CardContent, ErrorDisplay, LoadingState } from "@/components/ui"
-import { EmptyState } from "@/components/ui/empty-state"
-import { APIErrorBoundary } from "@/components/ErrorBoundary"
 import { ListControls, ArtistListItem } from "@/components/music"
 import { useTopArtists } from "@/hooks"
-import { announceToScreenReader } from "@/lib/accessibility"
 
 export default function TopArtistsPage() {
   const { data: session, status } = useSession()

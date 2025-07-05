@@ -36,10 +36,10 @@ export default function StatsPage() {
         
         <Card className="bg-black/50 border-green-800 text-white">
           <CardHeader>
-            <CardTitle className="text-green-400">📊 Stats & Analytics Coming Soon!</CardTitle>
+            <CardTitle className="text-green-400">📊 Stats &amp; Analytics Coming Soon!</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>We'll implement detailed music statistics and analytics here.</p>
+            <p>We&apos;ll implement detailed music statistics and analytics here.</p>
           </CardContent>
         </Card>
       </div>

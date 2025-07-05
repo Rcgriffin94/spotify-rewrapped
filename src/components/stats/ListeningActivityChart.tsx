@@ -50,7 +50,7 @@ export const ListeningActivityChart: React.FC<ListeningActivityChartProps> = ({
       <div className="mb-8">
         <h4 className="text-md font-medium text-gray-300 mb-3">By Hour of Day</h4>
         <div className="relative h-32 bg-gray-700/20 rounded p-2 flex items-end justify-between">
-          {hourlyData.map((item, index) => {
+          {hourlyData.map((item) => {
             const height = maxHourlyCount > 0 ? (item.count / maxHourlyCount) * 100 : 0;
             const barHeight = item.count > 0 ? Math.max(height, 5) : 0;
             

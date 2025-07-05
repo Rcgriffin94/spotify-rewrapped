@@ -2,13 +2,10 @@
 
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Card, CardContent, ErrorDisplay, LoadingState } from "@/components/ui"
-import { EmptyState } from "@/components/ui/empty-state"
-import { APIErrorBoundary } from "@/components/ErrorBoundary"
 import { RecentlyPlayedItem } from "@/components/music"
 import { FormattedRecentlyPlayed } from "@/lib/spotify-api"
-import { announceToScreenReader } from "@/lib/accessibility"
 
 export default function RecentlyPlayedPage() {
   const { data: session, status } = useSession()
@@ -29,7 +26,7 @@ export default function RecentlyPlayedPage() {
   }, [session, status, router])
 
   // Fetch recently played tracks
-  const fetchRecentlyPlayed = async (retryAttempt: number = 0) => {
+  const fetchRecentlyPlayed = useCallback(async (retryAttempt: number = 0) => {
     if (!session) return
 
     setIsLoading(true)
@@ -76,7 +73,7 @@ export default function RecentlyPlayedPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [session])
 
   const handleRetry = () => {
     fetchRecentlyPlayed(0)
@@ -86,7 +83,7 @@ export default function RecentlyPlayedPage() {
     if (session) {
       fetchRecentlyPlayed()
     }
-  }, [session])
+  }, [session, fetchRecentlyPlayed])
 
   if (status === "loading") {
     return (

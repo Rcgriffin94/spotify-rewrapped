@@ -44,32 +44,33 @@ export async function GET(request: NextRequest) {
       }
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in recently-played API route:', error);
 
     // Handle specific Spotify API errors
-    if (error.status === 401) {
+    const errorObj = error as { status?: number; message?: string };
+    if (errorObj.status === 401) {
       return NextResponse.json(
         { error: 'Spotify authentication failed. Please sign in again.' },
         { status: 401 }
       );
     }
 
-    if (error.status === 403) {
+    if (errorObj.status === 403) {
       return NextResponse.json(
         { error: 'Access forbidden. Check your Spotify account permissions.' },
         { status: 403 }
       );
     }
 
-    if (error.status === 429) {
+    if (errorObj.status === 429) {
       return NextResponse.json(
         { error: 'Rate limit exceeded. Please try again later.' },
         { status: 429 }
       );
     }
 
-    if (error.status === 500 || error.status === 502 || error.status === 503) {
+    if (errorObj.status === 500 || errorObj.status === 502 || errorObj.status === 503) {
       return NextResponse.json(
         { error: 'Spotify service temporarily unavailable. Please try again later.' },
         { status: 503 }
@@ -77,7 +78,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Handle network errors
-    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+    const codeError = error as { code?: string };
+    if (codeError.code === 'ENOTFOUND' || codeError.code === 'ECONNREFUSED') {
       return NextResponse.json(
         { error: 'Unable to connect to Spotify. Please check your internet connection.' },
         { status: 503 }
@@ -85,7 +87,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Handle timeout errors
-    if (error.code === 'ETIMEDOUT') {
+    if (codeError.code === 'ETIMEDOUT') {
       return NextResponse.json(
         { error: 'Request timed out. Please try again.' },
         { status: 504 }
@@ -93,10 +95,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Generic error fallback
+    const messageError = error as { message?: string; stack?: string };
     return NextResponse.json(
       { 
-        error: error.message || 'An unexpected error occurred while fetching recently played tracks',
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        error: messageError.message || 'An unexpected error occurred while fetching recently played tracks',
+        details: process.env.NODE_ENV === 'development' ? messageError.stack : undefined
       },
       { status: 500 }
     );

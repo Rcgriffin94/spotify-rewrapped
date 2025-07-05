@@ -1,5 +1,5 @@
 import { ReactNode } from "react"
-import { TimeRange, TopTrack, TopArtist, RecentlyPlayed, ListeningStats } from "./spotify"
+import { TimeRange, TopArtist, RecentlyPlayed } from "./spotify"
 import { FormattedTrack } from "@/lib/spotify-api"
 
 // Base component props
@@ -12,11 +12,11 @@ export interface BaseComponentProps {
 export interface LoadingState {
   isLoading: boolean
   error?: string | null
-  data?: any
+  data?: unknown
 }
 
 // Generic API response state
-export interface ApiState<T = any> {
+export interface ApiState<T = unknown> {
   data: T | null
   loading: boolean
   error: string | null
@@ -102,7 +102,7 @@ export interface StatsCardProps {
 }
 
 export interface ChartProps {
-  data: any[]
+  data: unknown[]
   title?: string
   height?: number
   className?: string
@@ -258,7 +258,7 @@ export interface HeaderProps {
 // Search and filter components
 export interface SearchState {
   query: string
-  filters: Record<string, any>
+  filters: Record<string, unknown>
   sortBy: string
   sortOrder: "asc" | "desc"
 }
@@ -284,7 +284,7 @@ export interface SearchAndFilterProps {
 export interface ErrorBoundaryState {
   hasError: boolean
   error?: Error
-  errorInfo?: any
+  errorInfo?: React.ErrorInfo
 }
 
 export interface ErrorFallbackProps {
@@ -325,7 +325,7 @@ export interface UsePaginationReturn {
 export interface NavigationItem {
   name: string
   href: string
-  iconComponent: any // LucideIcon component
+  iconComponent: React.ComponentType<{ className?: string }> // LucideIcon component
   description?: string
   isActive?: boolean
 }

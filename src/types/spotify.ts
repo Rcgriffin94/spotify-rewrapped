@@ -181,8 +181,8 @@ export interface SpotifyPaginatedResponse<T> {
 }
 
 // Specific response types
-export interface SpotifyTopTracksResponse extends SpotifyPaginatedResponse<SpotifyTrack> {}
-export interface SpotifyTopArtistsResponse extends SpotifyPaginatedResponse<SpotifyArtist> {}
+export type SpotifyTopTracksResponse = SpotifyPaginatedResponse<SpotifyTrack>
+export type SpotifyTopArtistsResponse = SpotifyPaginatedResponse<SpotifyArtist>
 
 // Time Range for Spotify API
 export type TimeRange = 'short_term' | 'medium_term' | 'long_term'

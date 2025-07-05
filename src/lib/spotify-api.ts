@@ -143,7 +143,7 @@ async function spotifyRequest<T>(
 // Helper function to validate time range
 function validateTimeRange(timeRange: string): 'short_term' | 'medium_term' | 'long_term' {
   const validRanges = ['short_term', 'medium_term', 'long_term'] as const
-  if (!validRanges.includes(timeRange as any)) {
+  if (!validRanges.includes(timeRange as 'short_term' | 'medium_term' | 'long_term')) {
     throw new Error(`Invalid time range: ${timeRange}. Must be one of: ${validRanges.join(', ')}`)
   }
   return timeRange as 'short_term' | 'medium_term' | 'long_term'
@@ -314,16 +314,14 @@ export async function getListeningStats(): Promise<ListeningStats> {
       longTermTracks,
       shortTermArtists,
       mediumTermArtists,
-      longTermArtists,
-      recentlyPlayed
+      longTermArtists
     ] = await Promise.all([
       getTopTracks('short_term', 50),
       getTopTracks('medium_term', 50),
       getTopTracks('long_term', 50),
       getTopArtists('short_term', 50),
       getTopArtists('medium_term', 50),
-      getTopArtists('long_term', 50),
-      getRecentlyPlayed(50)
+      getTopArtists('long_term', 50)
     ])
     
     // Calculate statistics

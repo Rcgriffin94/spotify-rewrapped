@@ -1,5 +1,5 @@
 // Performance monitoring and optimization utilities
-import { useEffect, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 
 // Web Vitals tracking
 export const trackWebVitals = () => {
@@ -9,7 +9,8 @@ export const trackWebVitals = () => {
   const observer = new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
       const { name } = entry;
-      const value = (entry as any).value || (entry as any).duration || 0;
+      const value = (entry as PerformanceEntry & { value?: number; duration?: number }).value || 
+                   (entry as PerformanceEntry & { value?: number; duration?: number }).duration || 0;
       
       // Log to console in development
       if (process.env.NODE_ENV === 'development') {
@@ -32,10 +33,7 @@ export const trackWebVitals = () => {
 
 // Image optimization helper
 export const getOptimizedImageUrl = (
-  originalUrl: string, 
-  width: number, 
-  height: number = width,
-  quality: number = 75
+  originalUrl: string
 ): string => {
   // For Spotify images, we can't directly optimize them
   // But we can ensure proper sizing attributes are used
@@ -54,7 +52,7 @@ export const logBundleInfo = () => {
   );
   
   const totalJSSize = jsResources.reduce((total, resource) => 
-    total + ((resource as any).transferSize || 0), 0
+    total + ((resource as PerformanceResourceTiming & { transferSize?: number }).transferSize || 0), 0
   );
   
   if (process.env.NODE_ENV === 'development') {
@@ -68,8 +66,14 @@ export const useMemoryMonitor = () => {
     if (typeof window === 'undefined' || !('memory' in performance)) return;
     
     const logMemoryUsage = () => {
-      const memory = (performance as any).memory;
-      if (process.env.NODE_ENV === 'development') {
+      const memory = (performance as typeof performance & { 
+        memory?: { 
+          usedJSHeapSize: number; 
+          totalJSHeapSize: number; 
+          jsHeapSizeLimit: number; 
+        } 
+      }).memory;
+      if (process.env.NODE_ENV === 'development' && memory) {
         console.log('Memory usage:', {
           used: `${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`,
           total: `${(memory.totalJSHeapSize / 1024 / 1024).toFixed(2)} MB`,
@@ -99,9 +103,17 @@ export const useNetworkStatus = () => {
     const updateOnlineStatus = () => setIsOnline(navigator.onLine);
     
     const updateConnectionType = () => {
-      const connection = (navigator as any).connection || 
-                        (navigator as any).mozConnection || 
-                        (navigator as any).webkitConnection;
+      const connection = (navigator as typeof navigator & { 
+        connection?: { effectiveType?: string; addEventListener?: (type: string, callback: () => void) => void; removeEventListener?: (type: string, callback: () => void) => void; };
+        mozConnection?: { effectiveType?: string; addEventListener?: (type: string, callback: () => void) => void; removeEventListener?: (type: string, callback: () => void) => void; };
+        webkitConnection?: { effectiveType?: string; addEventListener?: (type: string, callback: () => void) => void; removeEventListener?: (type: string, callback: () => void) => void; };
+      }).connection || 
+      (navigator as typeof navigator & { 
+        mozConnection?: { effectiveType?: string; addEventListener?: (type: string, callback: () => void) => void; removeEventListener?: (type: string, callback: () => void) => void; };
+      }).mozConnection || 
+      (navigator as typeof navigator & { 
+        webkitConnection?: { effectiveType?: string; addEventListener?: (type: string, callback: () => void) => void; removeEventListener?: (type: string, callback: () => void) => void; };
+      }).webkitConnection;
       
       if (connection) {
         setConnectionType(connection.effectiveType || 'unknown');
@@ -112,8 +124,10 @@ export const useNetworkStatus = () => {
     window.addEventListener('offline', updateOnlineStatus);
     
     // Update connection type on change
-    const connection = (navigator as any).connection;
-    if (connection) {
+    const connection = (navigator as typeof navigator & { 
+      connection?: { addEventListener?: (type: string, callback: () => void) => void; removeEventListener?: (type: string, callback: () => void) => void; };
+    }).connection;
+    if (connection && connection.addEventListener) {
       connection.addEventListener('change', updateConnectionType);
       updateConnectionType(); // Initial check
     }
@@ -121,7 +135,7 @@ export const useNetworkStatus = () => {
     return () => {
       window.removeEventListener('online', updateOnlineStatus);
       window.removeEventListener('offline', updateOnlineStatus);
-      if (connection) {
+      if (connection && connection.removeEventListener) {
         connection.removeEventListener('change', updateConnectionType);
       }
     };
@@ -135,15 +149,15 @@ export const preloadCriticalResources = () => {
   if (typeof window === 'undefined') return;
 
   // Preload critical fonts
-  const preloadFont = (href: string) => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.href = href;
-    link.as = 'font';
-    link.type = 'font/woff2';
-    link.crossOrigin = 'anonymous';
-    document.head.appendChild(link);
-  };
+  // const preloadFont = (href: string) => {
+  //   const link = document.createElement('link');
+  //   link.rel = 'preload';
+  //   link.href = href;
+  //   link.as = 'font';
+  //   link.type = 'font/woff2';
+  //   link.crossOrigin = 'anonymous';
+  //   document.head.appendChild(link);
+  // };
 
   // Preload API endpoints that are likely to be used
   const preloadAPI = (url: string) => {
@@ -221,5 +235,3 @@ export const setupErrorTracking = () => {
     // errorTrackingService.log(errorInfo);
   });
 };
-
-import { useState } from 'react';

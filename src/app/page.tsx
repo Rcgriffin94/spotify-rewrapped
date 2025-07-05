@@ -7,7 +7,7 @@ import { LoginBox } from "@/components/layout/LoginBox"
 import { TrendingUp, Users, Clock, BarChart3 } from "lucide-react"
 
 export default function Home() {
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const router = useRouter()
 
   // Redirect to top-songs if already authenticated

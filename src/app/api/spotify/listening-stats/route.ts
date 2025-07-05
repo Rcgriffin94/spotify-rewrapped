@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { SpotifyApiError } from '@/types/spotify';
 
 // Helper function to make Spotify API requests
 async function spotifyApiRequest(
@@ -30,7 +29,7 @@ async function spotifyApiRequest(
   return response.json();
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Check authentication
     const session = await getServerSession(authOptions);
@@ -123,7 +122,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Helper functions
-function extractTopGenres(artists: any[]): { genre: string; count: number; percentage: number }[] {
+function extractTopGenres(artists: { genres?: string[] }[]): { genre: string; count: number; percentage: number }[] {
   const genreCount: Record<string, number> = {};
   let totalGenres = 0;
   
@@ -146,14 +145,14 @@ function extractTopGenres(artists: any[]): { genre: string; count: number; perce
     .slice(0, 10); // Top 10 genres
 }
 
-function calculateAveragePopularity(items: any[]): number {
+function calculateAveragePopularity(items: { popularity?: number }[]): number {
   if (items.length === 0) return 0;
   
   const total = items.reduce((sum, item) => sum + (item.popularity || 0), 0);
   return Math.round(total / items.length);
 }
 
-function analyzeListeningActivity(recentItems: any[]): {
+function analyzeListeningActivity(recentItems: { played_at?: string }[]): {
   hourlyDistribution: Record<string, number>;
   dayOfWeekDistribution: Record<string, number>;
   timeRange: { earliest: string; latest: string; daysCovered: number };
@@ -196,12 +195,12 @@ function analyzeListeningActivity(recentItems: any[]): {
   };
 }
 
-function countUniqueArtists(tracks: any[]): number {
+function countUniqueArtists(tracks: { artists?: { id?: string }[] }[]): number {
   const uniqueArtists = new Set();
   
   tracks.forEach(track => {
     if (track.artists && Array.isArray(track.artists)) {
-      track.artists.forEach((artist: any) => {
+      track.artists.forEach((artist) => {
         if (artist.id) {
           uniqueArtists.add(artist.id);
         }
