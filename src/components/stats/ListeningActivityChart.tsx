@@ -3,12 +3,14 @@ import React from 'react';
 interface ListeningActivityChartProps {
   hourlyDistribution: Record<string, number>;
   dayOfWeekDistribution: Record<string, number>;
+  timeRange?: { earliest: string; latest: string; daysCovered: number };
   className?: string;
 }
 
 export const ListeningActivityChart: React.FC<ListeningActivityChartProps> = ({
   hourlyDistribution,
   dayOfWeekDistribution,
+  timeRange,
   className = '',
 }) => {
   // Prepare hourly data (0-23 hours)
@@ -31,6 +33,18 @@ export const ListeningActivityChart: React.FC<ListeningActivityChartProps> = ({
   return (
     <div className={`bg-gray-800 rounded-lg p-6 border border-gray-700 ${className}`}>
       <h3 className="text-lg font-semibold text-white mb-6">Listening Activity</h3>
+      
+      {/* Time Range Info */}
+      {timeRange && timeRange.daysCovered > 0 && (
+        <div className="mb-4 text-sm text-gray-400">
+          Based on your last 50 tracks over {timeRange.daysCovered} day{timeRange.daysCovered !== 1 ? 's' : ''} 
+          {timeRange.earliest && timeRange.latest && (
+            <span className="text-xs text-gray-500 block">
+              {new Date(timeRange.earliest).toLocaleDateString()} - {new Date(timeRange.latest).toLocaleDateString()}
+            </span>
+          )}
+        </div>
+      )}
       
       {/* Hourly Distribution */}
       <div className="mb-8">

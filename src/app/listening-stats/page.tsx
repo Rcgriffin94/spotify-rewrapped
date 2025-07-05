@@ -118,6 +118,7 @@ export default function ListeningStatsPage() {
         <ListeningActivityChart
           hourlyDistribution={stats.listeningActivity.hourlyDistribution}
           dayOfWeekDistribution={stats.listeningActivity.dayOfWeekDistribution}
+          timeRange={stats.listeningActivity.timeRange}
         />
       </div>
 

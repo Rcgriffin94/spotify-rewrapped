@@ -327,6 +327,11 @@ export interface DashboardStats {
 export interface ListeningActivity {
   hourlyDistribution: Record<string, number>
   dayOfWeekDistribution: Record<string, number>
+  timeRange: {
+    earliest: string
+    latest: string
+    daysCovered: number
+  }
 }
 
 export interface AudioFeaturesStats {

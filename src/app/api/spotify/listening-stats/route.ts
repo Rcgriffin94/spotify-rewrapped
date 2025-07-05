@@ -156,9 +156,12 @@ function calculateAveragePopularity(items: any[]): number {
 function analyzeListeningActivity(recentItems: any[]): {
   hourlyDistribution: Record<string, number>;
   dayOfWeekDistribution: Record<string, number>;
+  timeRange: { earliest: string; latest: string; daysCovered: number };
 } {
   const hourlyDistribution: Record<string, number> = {};
   const dayOfWeekDistribution: Record<string, number> = {};
+  
+  const timestamps: Date[] = [];
   
   recentItems.forEach(item => {
     if (item.played_at) {
@@ -168,10 +171,29 @@ function analyzeListeningActivity(recentItems: any[]): {
       
       hourlyDistribution[hour] = (hourlyDistribution[hour] || 0) + 1;
       dayOfWeekDistribution[dayOfWeek] = (dayOfWeekDistribution[dayOfWeek] || 0) + 1;
+      
+      timestamps.push(playedAt);
     }
   });
   
-  return { hourlyDistribution, dayOfWeekDistribution };
+  // Calculate time range
+  const sortedTimestamps = timestamps.sort((a, b) => a.getTime() - b.getTime());
+  const earliest = sortedTimestamps[0];
+  const latest = sortedTimestamps[sortedTimestamps.length - 1];
+  
+  const daysCovered = earliest && latest 
+    ? Math.ceil((latest.getTime() - earliest.getTime()) / (1000 * 60 * 60 * 24)) + 1
+    : 0;
+  
+  return { 
+    hourlyDistribution, 
+    dayOfWeekDistribution,
+    timeRange: {
+      earliest: earliest ? earliest.toISOString() : '',
+      latest: latest ? latest.toISOString() : '',
+      daysCovered
+    }
+  };
 }
 
 function countUniqueArtists(tracks: any[]): number {
