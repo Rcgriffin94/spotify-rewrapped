@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import { useState } from "react"
-import { Music, TrendingUp, Users, Clock, BarChart3, LogOut, User } from "lucide-react"
+import { Music, TrendingUp, Users, Clock, BarChart3, LogOut, User, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 // Navigation items configuration
@@ -31,6 +31,12 @@ const navigationItems = [
     href: "/listening-stats",
     icon: BarChart3,
     description: "Detailed analytics"
+  },
+  {
+    name: "Project Details",
+    href: "/project-details",
+    icon: Info,
+    description: "About this AI-built project"
   }
 ]
 
