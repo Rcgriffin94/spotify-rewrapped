@@ -2,12 +2,12 @@
 
 import { useSession } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, Suspense } from "react"
 import { signIn } from "next-auth/react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Clock, Code, Zap, Users, Database, User, Github } from "lucide-react"
 
-export default function Home() {
+function HomeContent() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -250,5 +250,15 @@ export default function Home() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-spotify-black flex items-center justify-center">
+      <div className="text-white">Loading...</div>
+    </div>}>
+      <HomeContent />
+    </Suspense>
   )
 }
