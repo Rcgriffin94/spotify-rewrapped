@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import { useState } from "react"
-import { Music, TrendingUp, Users, Clock, BarChart3, LogOut, User, Info } from "lucide-react"
+import { Music, TrendingUp, Users, Clock, BarChart3, LogOut, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 // Navigation items configuration
@@ -31,12 +31,6 @@ const navigationItems = [
     href: "/listening-stats",
     icon: BarChart3,
     description: "Detailed analytics"
-  },
-  {
-    name: "Project Details",
-    href: "/project-details",
-    icon: Info,
-    description: "About this AI-built project"
   }
 ]
 
@@ -75,14 +69,17 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo/Brand */}
-          <div className="flex items-center space-x-3">
+          <button 
+            onClick={() => handleNavigation('/')}
+            className="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200"
+          >
             <div className="w-8 h-8 bg-spotify-green rounded-full flex items-center justify-center">
               <Music className="w-5 h-5 text-black" />
             </div>
             <span className="text-white text-xl font-bold">
               Spotify <span className="text-spotify-green">Rewrapped</span>
             </span>
-          </div>
+          </button>
 
           {/* Navigation Items */}
           <div className="flex items-center space-x-1">

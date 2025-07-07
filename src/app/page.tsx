@@ -3,81 +3,246 @@
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { LoginBox } from "@/components/layout/LoginBox"
-import { TrendingUp, Users, Clock, BarChart3 } from "lucide-react"
+import { signIn } from "next-auth/react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Clock, Code, Zap, Users, Database, User, Github } from "lucide-react"
 
 export default function Home() {
   const { data: session } = useSession()
   const router = useRouter()
 
   // Redirect to top-songs if already authenticated
-  useEffect(() => {
-    if (session) {
-      router.push('/top-songs')
-    }
-  }, [session, router])
+  // Note: Commented out to allow authenticated users to view project details
+  // useEffect(() => {
+  //   if (session) {
+  //     router.push('/top-songs')
+  //   }
+  // }, [session, router])
+
+  const techStack = [
+    "Next.js 14",
+    "TypeScript",
+    "Tailwind CSS",
+    "NextAuth.js",
+    "Spotify Web API",
+    "Vercel",
+    "GitHub Copilot",
+    "Claude",
+    "ChatGPT"
+  ]
+
+  const features = [
+    "Spotify OAuth Authentication",
+    "Top Tracks Analysis",
+    "Top Artists Discovery", 
+    "Recently Played History",
+    "Listening Statistics & Charts",
+    "Responsive Design",
+    "Production Deployment"
+  ]
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-20 left-20 w-72 h-72 bg-green-500 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-green-500 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-green-500 rounded-full blur-3xl" />
-      </div>
+    <div className="min-h-screen text-white">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Notes from the Developer */}
+          <Card className="bg-black/50 border-green-800 mb-8">
+            <CardHeader>
+              <CardTitle className="text-green-400 flex items-center gap-2">
+                <User className="w-5 h-5" />
+                Notes from the Developer
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-gray-300 space-y-4">
+              <p>
+                I use the title &quot;<em>developer</em>&quot; very loosely here. I&apos;ve dabbled in development as a hobby, 
+                but I&apos;ve never done it professionally. You could say I know just enough to be dangerous.
+              </p>
+              <p>
+                This project started as an idea to recreate Spotify Wrapped. Originally, it was just a way 
+                for me to learn more about coding. Over time, though, the idea faded and was eventually 
+                forgotten until recently. With the growing focus on AI, I thought it would be a fun experiment 
+                to see if I could build something using AI without writing any code. I never expected it to be this easy. 
+                I built this entire project in just a few hours over the weekend 100% with AI.
+              </p>
+              <p>
+                I&apos;ve learned a lot through this process. First, I&apos;ve gained a deep respect for developers. 
+                Their work requires immense skill and patience. I also learned how to incorporate AI into both 
+                my personal and professional life. For this project, I spent a lot of time establishing the 
+                ground rules and designing the architecture to keep Copilot on track. But once Copilot had 
+                the right context, it performed the work of several engineers in minutes.
+              </p>
+            </CardContent>
+          </Card>
 
-      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <div className="max-w-6xl w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left side - Hero content */}
-            <div className="space-y-8 text-center lg:text-left">
-              <div className="space-y-4">
-                <h1 className="text-5xl lg:text-6xl font-bold text-white leading-tight">
-                  Your Music
-                  <br />
-                  <span className="text-spotify-green">Rewrapped</span>
-                </h1>
-                <p className="text-xl text-gray-300 max-w-lg">
-                  Dive deep into your Spotify listening habits with beautiful visualizations 
-                  and personalized insights about your musical journey.
+          {/* Call to Action - Different content based on auth status */}
+          <Card className="bg-gradient-to-r from-green-600 to-green-700 border-green-500 mb-8">
+            <CardContent className="text-center py-8">
+              {!session ? (
+                <>
+                  <h2 className="text-2xl font-bold text-white mb-4">
+                    Ready to Explore Your Music?
+                  </h2>
+                  <p className="text-green-100 mb-6 max-w-2xl mx-auto">
+                    Connect your Spotify account to discover your listening patterns, top tracks, 
+                    favorite artists, and get insights into your music taste.
+                  </p>
+                  <button
+                    onClick={() => signIn('spotify')}
+                    className="bg-white text-green-700 hover:bg-gray-100 font-semibold py-3 px-8 rounded-full text-lg transition-all duration-200 hover:scale-105 shadow-lg"
+                  >
+                    Sign In with Spotify
+                  </button>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-2xl font-bold text-white mb-4">
+                    Welcome Back! 👋
+                  </h2>
+                  <p className="text-green-100 mb-6 max-w-2xl mx-auto">
+                    Dive into your personalized music analytics and discover insights about your listening habits.
+                  </p>
+                  <button
+                    onClick={() => router.push('/top-songs')}
+                    className="bg-white text-green-700 hover:bg-gray-100 font-semibold py-3 px-8 rounded-full text-lg transition-all duration-200 hover:scale-105 shadow-lg"
+                  >
+                    View Your Music Data
+                  </button>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Main Content Grid */}
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            
+            {/* Project Overview */}
+            <Card className="bg-black/50 border-green-800">
+              <CardHeader>
+                <CardTitle className="text-green-400 flex items-center gap-2">
+                  <Zap className="w-5 h-5" />
+                  Built with AI in Record Time
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-2 text-gray-300">
+                  <Clock className="w-4 h-4" />
+                  <span>Development Time: Weekend Project</span>
+                </div>
+                <p className="text-gray-300">
+                  This entire application was conceived, designed, and built using AI assistance over a single weekend. 
+                  From initial concept to production deployment, AI helped accelerate every step of the development process.
                 </p>
-              </div>
+                <p className="text-gray-300">
+                  The project demonstrates the power of modern AI tools in rapid prototyping and full-stack development, 
+                  enabling complex features like OAuth integration, data visualization, and responsive design in minimal time.
+                </p>
+              </CardContent>
+            </Card>
 
-              {/* Feature highlights */}
-              <div className="grid grid-cols-2 gap-4 max-w-md mx-auto lg:mx-0">
-                <div className="flex items-center space-x-2 text-gray-300">
-                  <TrendingUp className="w-5 h-5 text-spotify-green" />
-                  <span className="text-sm">Top Tracks</span>
+            {/* Tech Stack */}
+            <Card className="bg-black/50 border-green-800">
+              <CardHeader>
+                <CardTitle className="text-green-400 flex items-center gap-2">
+                  <Code className="w-5 h-5" />
+                  Technology Stack
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {techStack.map((tech) => (
+                    <span 
+                      key={tech} 
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-800 text-green-400 border border-green-800"
+                    >
+                      {tech}
+                    </span>
+                  ))}
                 </div>
-                <div className="flex items-center space-x-2 text-gray-300">
-                  <Users className="w-5 h-5 text-spotify-green" />
-                  <span className="text-sm">Favorite Artists</span>
+                
+                {/* GitHub Repository Link */}
+                <div className="mt-6 pt-4 border-t border-gray-700">
+                  <a 
+                    href="https://github.com/Rcgriffin94/spotify-rewrapped" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-green-400 hover:text-green-300 rounded-lg border border-gray-600 hover:border-green-600 transition-all duration-200 group"
+                  >
+                    <Github className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span className="text-sm font-medium">View Source Code</span>
+                  </a>
                 </div>
-                <div className="flex items-center space-x-2 text-gray-300">
-                  <Clock className="w-5 h-5 text-spotify-green" />
-                  <span className="text-sm">Recent Plays</span>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Features Implemented */}
+          <Card className="bg-black/50 border-green-800 mb-8">
+            <CardHeader>
+              <CardTitle className="text-green-400 flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Features Implemented
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-4">
+                {features.map((feature) => (
+                  <div key={feature} className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span className="text-gray-300">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Development Process */}
+          <Card className="bg-black/50 border-green-800 mb-8">
+            <CardHeader>
+              <CardTitle className="text-green-400 flex items-center gap-2">
+                <Database className="w-5 h-5" />
+                AI-Assisted Development Process
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-white font-semibold mb-2">Planning & Architecture</h4>
+                  <p className="text-gray-300 text-sm">
+                    AI helped design the application architecture, plan the component structure, 
+                    and set up the development environment with best practices.
+                  </p>
                 </div>
-                <div className="flex items-center space-x-2 text-gray-300">
-                  <BarChart3 className="w-5 h-5 text-spotify-green" />
-                  <span className="text-sm">Listening Stats</span>
+                <div>
+                  <h4 className="text-white font-semibold mb-2">Code Generation</h4>
+                  <p className="text-gray-300 text-sm">
+                    Complex features like OAuth flows, API integrations, and data visualization 
+                    components were generated and refined with AI assistance.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-white font-semibold mb-2">Debugging & Optimization</h4>
+                  <p className="text-gray-300 text-sm">
+                    AI helped identify and resolve TypeScript errors, ESLint issues, 
+                    and performance bottlenecks throughout development.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-white font-semibold mb-2">Deployment & Production</h4>
+                  <p className="text-gray-300 text-sm">
+                    From environment configuration to Vercel deployment, AI guided 
+                    the entire production setup and troubleshooting process.
+                  </p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
 
-              <div className="space-y-2 text-sm text-gray-400">
-                <p>🔒 Your data stays private and secure</p>
-                <p>📊 Real-time insights from your Spotify account</p>
-                <p>🎵 Discover patterns in your music taste</p>
-              </div>
-            </div>
-
-            {/* Right side - Login box */}
-            <div className="flex justify-center lg:justify-end">
-              <LoginBox 
-                title="Connect Your Spotify"
-                description="Sign in to unlock personalized insights about your music listening habits"
-                className="w-full max-w-md"
-              />
-            </div>
+          {/* Footer */}
+          <div className="text-center mt-12 pt-8 border-t border-gray-800">
+            <p className="text-gray-500 text-sm">
+              Built by Ryan Griffin, June 2025
+            </p>
           </div>
         </div>
       </div>
