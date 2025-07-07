@@ -2,21 +2,21 @@
 
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 import { signIn } from "next-auth/react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Clock, Code, Zap, Users, Database, User, Github } from "lucide-react"
 
 export default function Home() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const router = useRouter()
 
-  // Redirect to top-songs if already authenticated
-  // Note: Commented out to allow authenticated users to view project details
-  // useEffect(() => {
-  //   if (session) {
-  //     router.push('/top-songs')
-  //   }
-  // }, [session, router])
+  // Redirect to top-songs after successful authentication
+  useEffect(() => {
+    if (status === 'authenticated' && session) {
+      router.push('/top-songs')
+    }
+  }, [session, status, router])
 
   const techStack = [
     "Next.js 14",
