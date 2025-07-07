@@ -1,7 +1,7 @@
 "use client"
 
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect } from "react"
 import { signIn } from "next-auth/react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,13 +10,17 @@ import { Clock, Code, Zap, Users, Database, User, Github } from "lucide-react"
 export default function Home() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  
+  // Check if user explicitly wants to view project details
+  const viewProject = searchParams.get('view') === 'project'
 
-  // Redirect to top-songs after successful authentication
+  // Redirect to top-songs after successful authentication (unless viewing project details)
   useEffect(() => {
-    if (status === 'authenticated' && session) {
+    if (status === 'authenticated' && session && !viewProject) {
       router.push('/top-songs')
     }
-  }, [session, status, router])
+  }, [session, status, router, viewProject])
 
   const techStack = [
     "Next.js 14",

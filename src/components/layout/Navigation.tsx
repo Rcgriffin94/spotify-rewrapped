@@ -70,7 +70,7 @@ export function Navigation() {
         <div className="flex items-center justify-between h-16">
           {/* Logo/Brand */}
           <button 
-            onClick={() => handleNavigation('/')}
+            onClick={() => handleNavigation('/?view=project')}
             className="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200"
           >
             <div className="w-8 h-8 bg-spotify-green rounded-full flex items-center justify-center">
